@@ -1,0 +1,18 @@
+{
+  "name": "Corsivo Dictionary",
+  "short_name": "Corsivo",
+  "description": "Discover word meanings, audio pronunciations, synonyms, and word of the day in Corsivo - a premium, glassmorphic dark-themed app.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#090616",
+  "theme_color": "#090616",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
