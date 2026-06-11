@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vocabulary Notebook — Corsivo</title>
+    <meta name="description" content="Manage your vocabulary study notes and custom comments on words in Corsivo.">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#090616">
+    <link rel="icon" type="image/svg+xml" href="icon.svg">
+</head>
+<body>
+    <div class="page-layout">
+        <nav class="page-nav">
+            <a href="index.html" class="page-back-btn">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+                Dictionary
+            </a>
+            <a href="index.html" class="nav-brand">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M15 4c-3.5 0-7 2.5-8.5 6s-.5 7.5 2 10 7 1.5 8.5-.5" />
+                    <path d="M9 15c.5-2.5 2-5.5 4.5-8 3-3 6.5-4 7.5-3s0 4.5-3 7.5c-2.5 2.5-5.5 4-8 4.5z" />
+                    <path d="M13.5 10.5l6-6" stroke-width="1.5" />
+                    <path d="M9 15l-6 6" stroke-width="1.5" />
+                    <circle cx="3" cy="21" r="0.8" fill="currentColor" />
+                </svg>
+                Corsivo
+            </a>
+        </nav>
+
+        <div class="page-card">
+            <svg class="page-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C6.5 6.253 2 10.753 2 16.253s4.5 10 10 10 10-4.5 10-10-4.5-10-10-10z"/>
+            </svg>
+            <h1>Vocabulary Notebook</h1>
+            <p class="page-subtitle">Search, review, and manage your study notes.</p>
+
+            <div class="notebook-controls" style="margin: 2rem 0;">
+                <input type="text" id="notebook-search" placeholder="Search study notes..." oninput="filterNotebookNotes()" class="sidebar-search-input" aria-label="Search study notes" style="width: 100%; margin-bottom: 1rem;">
+            </div>
+            
+            <ul class="notebook-list" id="notebook-list" style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-color); border-radius: 14px; padding: 0.75rem; max-height: 500px; overflow-y: auto;">
+                <li class="empty-state">No notes found. Create custom notes on words in the dictionary to list them here.</li>
+            </ul>
+
+            <h2 style="margin-top: 2rem;">How to Use</h2>
+            <ul>
+                <li><strong>Add Notes:</strong> Return to the dictionary, search for a word, and click the "Add Note" option to create a study note.</li>
+                <li><strong>Search:</strong> Use the search box above to filter through all your notes by word or content.</li>
+                <li><strong>Review:</strong> Revisit your notes anytime to reinforce vocabulary learning.</li>
+                <li><strong>Delete:</strong> Remove notes you no longer need by clicking the delete button next to each entry.</li>
+                <li><strong>Backup:</strong> Export all your notes using the Backup & Restore page to save them securely.</li>
+            </ul>
+        </div>
+
+        <div class="page-footer">
+            &copy; 2026 Corsivo. Words, beautifully slanted.
+        </div>
+    </div>
+
+    <script>
+        // Load saved theme
+        const savedTheme = localStorage.getItem("lexicon_theme") || "dark";
+        document.body.className = savedTheme;
+
+        // Render notebook notes on page load
+        window.addEventListener('load', renderNotebookNotes);
+
+        function renderNotebookNotes() {
+            const list = document.getElementById("notebook-list");
+            if (!list) return;
+
+            const notesObj = JSON.parse(localStorage.getItem("lexicon_notes") || "{}");
+            const words = Object.keys(notesObj);
+
+            if (words.length === 0) {
+                list.innerHTML = '<li class="empty-state">No saved study notes. Write note comments on words to see them here.</li>';
+                return;
+            }
+
+            const searchQuery = (document.getElementById("notebook-search")?.value || "").trim().toLowerCase();
+
+            const filtered = words.filter(w => {
+                if (!searchQuery) return true;
+                if (w.toLowerCase().includes(searchQuery)) return true;
+                if (notesObj[w].toLowerCase().includes(searchQuery)) return true;
+                return false;
+            });
+
+            if (filtered.length === 0) {
+                list.innerHTML = '<li class="empty-state">No matching study notes.</li>';
+                return;
+            }
+
+            list.innerHTML = filtered.map(word => `
+                <li class="notebook-item">
+                    <div class="notebook-item-content">
+                        <span class="notebook-word-title" onclick="notebookSearchWord('${word.replace(/'/g, "\\'")}')">${word}</span>
+                        <p class="notebook-note-text">${escapeHTML(notesObj[word])}</p>
+                    </div>
+                    <div class="notebook-actions">
+                        <button class="notebook-action-btn delete" onclick="deleteNotebookNote(event, '${word.replace(/'/g, "\\'")}')" title="Delete Note">
+                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                        </button>
+                    </div>
+                </li>
+            `).join("");
+        }
+
+        function notebookSearchWord(word) {
+            window.location.href = `index.html?word=${encodeURIComponent(word)}`;
+        }
+
+        function deleteNotebookNote(event, word) {
+            event.stopPropagation();
+            if (confirm(`Delete note for "${word}"?`)) {
+                const notesObj = JSON.parse(localStorage.getItem("lexicon_notes") || "{}");
+                delete notesObj[word.toLowerCase()];
+                localStorage.setItem("lexicon_notes", JSON.stringify(notesObj));
+                renderNotebookNotes();
+            }
+        }
+
+        function escapeHTML(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backup & Restore — Corsivo</title>
+    <meta name="description" content="Backup, restore, and import/export your dictionary data in Corsivo.">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#090616">
+    <link rel="icon" type="image/svg+xml" href="icon.svg">
+</head>
+<body>
+    <div class="page-layout">
+        <nav class="page-nav">
+            <a href="index.html" class="page-back-btn">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+                Dictionary
+            </a>
+            <a href="index.html" class="nav-brand">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M15 4c-3.5 0-7 2.5-8.5 6s-.5 7.5 2 10 7 1.5 8.5-.5" />
+                    <path d="M9 15c.5-2.5 2-5.5 4.5-8 3-3 6.5-4 7.5-3s0 4.5-3 7.5c-2.5 2.5-5.5 4-8 4.5z" />
+                    <path d="M13.5 10.5l6-6" stroke-width="1.5" />
+                    <path d="M9 15l-6 6" stroke-width="1.5" />
+                    <circle cx="3" cy="21" r="0.8" fill="currentColor" />
+                </svg>
+                Corsivo
+            </a>
+        </nav>
+
+        <div class="page-card">
+            <svg class="page-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3v-6"/>
+            </svg>
+            <h1>Backup & Restore</h1>
+            <p class="page-subtitle">Secure your data with simple import and export.</p>
+
+            <div style="display: flex; gap: 1rem; margin-top: 2.5rem; margin-bottom: 2.5rem; flex-wrap: wrap;">
+                <button onclick="exportData()" class="modal-btn modal-btn-confirm" style="display: flex; align-items: center; gap: 0.5rem; justify-content: center; flex: 1; min-width: 200px;">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                    </svg>
+                    Export Data (.json)
+                </button>
+                <button onclick="triggerImport()" class="modal-btn modal-btn-cancel" style="display: flex; align-items: center; gap: 0.5rem; justify-content: center; flex: 1; min-width: 200px; border: 1px dashed var(--border-color);">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                    </svg>
+                    Import Data (.json)
+                </button>
+                <input type="file" id="import-file-input" style="display: none;" accept=".json" onchange="importData(event)">
+            </div>
+
+            <h2>Why Backup Your Data?</h2>
+            <p>Your bookmarks, personal notes, and search history are valuable parts of your learning journey. Corsivo stores all this data locally on your device for complete privacy. However, creating backups ensures you never lose your progress if your browser data gets cleared or if you switch devices.</p>
+
+            <h2>What Gets Backed Up?</h2>
+            <ul>
+                <li><strong>Bookmarks:</strong> All your saved and favorited words.</li>
+                <li><strong>Personal Notes:</strong> Custom study notes and comments you've added to words.</li>
+                <li><strong>Search History:</strong> Your recent word lookups and exploration history.</li>
+                <li><strong>Preferences:</strong> Your selected color theme and display settings.</li>
+            </ul>
+
+            <h2>How to Export Your Data</h2>
+            <ul>
+                <li><strong>One-Click Export:</strong> Click the "Export Data" button above to download all your bookmarks, study notes, and history as a single JSON file.</li>
+                <li><strong>Safe Storage:</strong> Save the JSON file in a secure location on your computer, cloud drive, or external storage.</li>
+                <li><strong>Complete Copy:</strong> The exported file contains a complete snapshot of your Corsivo data at the time of export.</li>
+            </ul>
+
+            <h2>How to Restore Your Data</h2>
+            <ul>
+                <li><strong>Select File:</strong> Click the "Import Data" button and choose your previously exported JSON file.</li>
+                <li><strong>Automatic Merge:</strong> Your data will be seamlessly imported and merged with your current Corsivo data.</li>
+                <li><strong>Cross-Device Sync:</strong> Transfer your vocabulary learning progress between different browsers or devices using the same JSON file.</li>
+            </ul>
+
+            <p style="margin-top: 2.5rem; padding: 1.5rem; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); border-radius: 14px; font-size: 0.9rem;">
+                <strong>Note:</strong> All data remains 100% on your device—never sent to servers. Your privacy is our priority.
+            </p>
+        </div>
+
+        <div class="page-footer">
+            &copy; 2026 Corsivo. Words, beautifully slanted.
+        </div>
+    </div>
+
+    <script>
+        // Load saved theme
+        const savedTheme = localStorage.getItem("lexicon_theme") || "dark";
+        document.body.className = savedTheme;
+
+        // Backup and restore functions
+        function exportData() {
+            const data = {
+                theme: localStorage.getItem("lexicon_theme") || "dark",
+                history: JSON.parse(localStorage.getItem("lexicon_history") || "[]"),
+                bookmarks: JSON.parse(localStorage.getItem("lexicon_bookmarks") || "[]"),
+                notes: JSON.parse(localStorage.getItem("lexicon_notes") || "{}"),
+                cache: JSON.parse(localStorage.getItem("lexicon_word_cache") || "{}")
+            };
+
+            const jsonString = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(data, null, 2))}`;
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", jsonString);
+            downloadAnchor.setAttribute("download", `corsivo_dictionary_backup_${new Date().toISOString().slice(0, 10)}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+
+            showToast("Vocabulary database exported!", "success");
+        }
+
+        function triggerImport() {
+            const fileInput = document.getElementById("import-file-input");
+            if (fileInput) fileInput.click();
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    if (data.theme) {
+                        localStorage.setItem("lexicon_theme", data.theme);
+                        document.body.className = data.theme;
+                    }
+                    
+                    if (Array.isArray(data.history)) {
+                        localStorage.setItem("lexicon_history", JSON.stringify(data.history));
+                    }
+                    
+                    if (Array.isArray(data.bookmarks)) {
+                        localStorage.setItem("lexicon_bookmarks", JSON.stringify(data.bookmarks));
+                    }
+                    
+                    if (data.notes && typeof data.notes === 'object') {
+                        localStorage.setItem("lexicon_notes", JSON.stringify(data.notes));
+                    }
+                    
+                    if (data.cache && typeof data.cache === 'object') {
+                        localStorage.setItem("lexicon_word_cache", JSON.stringify(data.cache));
+                    }
+
+                    showToast("Data imported successfully! Redirecting to dictionary...", "success");
+                    setTimeout(() => {
+                        window.location.href = "index.html";
+                    }, 2000);
+                } catch (error) {
+                    showToast("Error: Invalid JSON file format.", "error");
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function showToast(message, type = "info") {
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.textContent = message;
+            
+            const container = document.querySelector('.toast-container') || createToastContainer();
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.add('toast-out');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function createToastContainer() {
+            const container = document.createElement('div');
+            container.className = 'toast-container';
+            document.body.appendChild(container);
+            return container;
+        }
+    </script>
+</body>
+</html>
